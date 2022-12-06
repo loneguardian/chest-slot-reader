@@ -1,0 +1,9 @@
+{
+	"name": "chest-slot-reader",
+	"version": "0.1.0",
+	"factorio_version": "1.1",
+	"title": "Chest Slot Reader",
+	"author": "Xeraph",
+	"description": "Combinator that reads the number of filled and empty slots of a chest and output them as signals.",
+	"dependencies": ["base", "flib >= 0.11.2", "? PickerDollies >= 1.0.9"]
+}
