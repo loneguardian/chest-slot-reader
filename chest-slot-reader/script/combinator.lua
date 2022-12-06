@@ -4,6 +4,10 @@ local area = require("__flib__.area")
 
 local _M = {}
 
+local no_signal = c.SIGNALS.NO_SIGNAL
+local signal_F = c.SIGNALS.SIGNAL_F
+local signal_E = c.SIGNALS.SIGNAL_E
+
 ---@class CsrState
 local mt = {}
 local mt_proxy = {__index = mt}
@@ -42,9 +46,9 @@ function _M.create(entity)
 end
 
 ---@param chest LuaEntity
-function _M.update_chests(chest, is_destroyed)
+function _M.update_chests(chest, is_destroyed, is_picker_dolly)
     local bounding_box = chest.bounding_box
-    local search_area = area.expand(bounding_box, 1)
+    local search_area = area.expand(bounding_box, is_picker_dolly and 2 or 1)
     local combinators = chest.surface.find_entities_filtered{name = c.CSR_NAME, area = search_area}
     for i=1,#combinators do
         local state = global.states[combinators[i].unit_number]
@@ -119,16 +123,30 @@ function mt:update()
             self:reset_params()
             return
         end
+
         local inventory = self.chest_inventory
         local empty_count = inventory.count_empty_stacks()
         local filled_count = self.chest_inventory_slot - empty_count
+        local has_changed = false
 
-        if self.cb_params[1].count ~= filled_count or self.cb_params[2].count ~= empty_count then
-            self.cb_params[1].count = filled_count
-            self.cb_params[2].count = empty_count
-            self.zero_signal = (filled_count == 0 and empty_count == 0) or false
-            self.cb.parameters = self.cb_params
+        for i=1,#self.cb_params do
+            local param = self.cb_params[i]
+            local count = (i == 1) and filled_count or empty_count
+            if param.count ~= count then
+                has_changed = true
+                param.count = count
+                if count == 0 then
+                    param.signal = no_signal
+                elseif i == 1 then
+                    param.signal = signal_F
+                elseif i == 2 then
+                    param.signal = signal_E
+                end
+            end
         end
+
+        self.zero_signal = (filled_count == 0 and empty_count == 0) or false
+        if has_changed then self.cb.parameters = self.cb_params end
     else
         if not self.zero_signal then
             self:reset_params()
@@ -142,18 +160,12 @@ end
 function mt:init_cb_params()
     self.cb_params = {
         {
-            signal = {
-                type = "virtual",
-                name = "signal-F"
-            },
+            signal = no_signal,
             count = 0,
             index = 1
         },
         {
-            signal = {
-                type = "virtual",
-                name = "signal-E"
-            },
+            signal = no_signal,
             count = 0,
             index = 2
         }
@@ -162,8 +174,10 @@ end
 
 ---@param self CsrState
 function mt:reset_params()
-    self.cb_params[1].count = 0
-    self.cb_params[2].count = 0
+    for i=1,#self.cb_params do
+        self.cb_params[i].signal = no_signal
+        self.cb_params[i].count = 0
+    end
     self.zero_signal = true
     self.cb.parameters = self.cb_params
 end

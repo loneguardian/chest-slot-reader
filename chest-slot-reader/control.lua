@@ -37,6 +37,8 @@ local function on_load()
             if entity.name == c.CSR_NAME then
                 local state = global.states[entity.unit_number]
                 state:find_chest()
+            elseif c.CONTAINER_TYPES[entity.type] then
+                combinator.update_chests(entity, nil, true)
             end
         end)
     end

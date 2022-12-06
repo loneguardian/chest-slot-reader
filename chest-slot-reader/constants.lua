@@ -12,7 +12,13 @@ local c = {
     },
 
     UPDATE_RATE_NAME = MOD_NAME .. ":max-update-per-tick",
-    UPDATE_RATE = 4
+    UPDATE_RATE = 4,
+
+    SIGNALS = {
+        NO_SIGNAL = {type = "virtual"},
+        SIGNAL_F = {type = "virtual", name = "signal-F"},
+        SIGNAL_E = {type = "virtual", name = "signal-E"}
+    }
 }
 
 return c
