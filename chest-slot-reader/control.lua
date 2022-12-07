@@ -100,8 +100,10 @@ script.on_event(defines.events.script_raised_destroy, on_destroy, built_destroy_
 ---@param event EventData.on_player_rotated_entity
 local function on_rotate_combinator(event)
     local entity = event.entity
-    if entity.valid then
-        global.states[entity.unit_number]:find_chest()
+    if not (entity and entity.valid) then return end
+    if entity.name == c.CSR_NAME then
+        local state = global.states[entity.unit_number]
+        if state then state:find_chest() end
     end
 end
 script.on_event(defines.events.on_player_rotated_entity, on_rotate_combinator)
