@@ -61,11 +61,7 @@ local function on_built(event)
     local entity = event.created_entity or event.destination or event.entity
     if not entity then return end
     if entity.name == c.CSR_NAME then
-        local state = combinator.create(entity)
-        local is_blueprint = event.stack and event.stack.is_blueprint
-        if is_blueprint then
-            state:reset_params()
-        end
+        combinator.create(entity)
     elseif c.CONTAINER_TYPES[entity.type] then
         combinator.update_chests(entity)
     end

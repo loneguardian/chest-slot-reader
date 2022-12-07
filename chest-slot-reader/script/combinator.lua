@@ -68,6 +68,12 @@ end
 
 -- chest management
 
+local flying_text_found_chest = {
+    name = 'flying-text',
+    position = nil,
+    text = {"flying-text.found-chest"},
+    color = {255, 255, 255},
+}
 local chest_types = {}
 for k in pairs(c.CONTAINER_TYPES) do
     chest_types[#chest_types+1] = k
@@ -86,6 +92,8 @@ function mt:find_chest()
     if self.chest then
         self.chest_inventory = self.chest.get_inventory(defines.inventory.chest)
         self.chest_inventory_slot = #self.chest_inventory
+        flying_text_found_chest.position = entity_position
+        self.entity.surface.create_entity(flying_text_found_chest)
     else
         self.chest_inventory = nil
         self.chest_inventory_slot = nil
@@ -170,6 +178,7 @@ function mt:init_cb_params()
             index = 2
         }
     }
+    self.cb.parameters = self.cb_params
 end
 
 ---@param self CsrState
