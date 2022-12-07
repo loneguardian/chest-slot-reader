@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.1
+Date: 2022-12-08
+  Bugfixes:
+    - Fixed crash when rotating entities (https://mods.factorio.com/mod/chest-slot-reader/discussion/63909b8de78e95238ad0d430)
+  Changes:
+    - Added flying text when a reader is latched to a chest
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2022-12-06
   Info:
