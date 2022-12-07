@@ -4,13 +4,12 @@ local combinator = require("script/combinator")
 local max_update_per_tick = settings.global[c.UPDATE_RATE_NAME].value
 
 -- upvalues
-local global_ordered, current_tick, total, cached_total, interval, upper_bound
+local global_ordered, total, cached_total, interval, upper_bound
 
 ---@param event EventData.on_tick
 local function on_tick(event)
     total = #global_ordered
     if total == 0 then return end
-    current_tick = event.tick
     if total ~= cached_total then
         cached_total = total
         upper_bound = math.min(total, max_update_per_tick)
@@ -21,7 +20,7 @@ local function on_tick(event)
         end
     end
     for i = 1, upper_bound do
-        global_ordered[(current_tick + interval * i) % total + 1]:update()
+        global_ordered[(event.tick + interval * i) % total + 1]:update()
     end
 end
 script.on_event(defines.events.on_tick, on_tick)

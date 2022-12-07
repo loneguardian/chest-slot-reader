@@ -115,43 +115,43 @@ end
 
 ---@param self CsrState
 function mt:update()
-    if not self.entity.valid then self:delete() end
+    if not self.entity.valid then
+        self:delete()
+        return
+    end
     if not self.enabled then return end
-    if self.chest then
-        if not self.chest.valid then
-            self:remove_chest()
-            self:reset_params()
-            return
-        end
+    if not self.chest then
+        if not self.zero_signal then self:reset_params() end
+        return
+    end
+    if not self.chest.valid then
+        self:remove_chest()
+        self:reset_params()
+        return
+    end
 
-        local inventory = self.chest_inventory
-        local empty_count = inventory.count_empty_stacks()
-        local filled_count = self.chest_inventory_slot - empty_count
-        local has_changed = false
+    local empty_count = self.chest_inventory.count_empty_stacks()
+    local filled_count = self.chest_inventory_slot - empty_count
+    local has_changed = false
 
-        for i=1,#self.cb_params do
-            local param = self.cb_params[i]
-            local count = (i == 1) and filled_count or empty_count
-            if param.count ~= count then
-                has_changed = true
-                param.count = count
-                if count == 0 then
-                    param.signal = no_signal
-                elseif i == 1 then
-                    param.signal = signal_F
-                elseif i == 2 then
-                    param.signal = signal_E
-                end
+    for i=1,#self.cb_params do
+        local param = self.cb_params[i]
+        local count = (i == 1) and filled_count or empty_count
+        if param.count ~= count then
+            has_changed = true
+            param.count = count
+            if count == 0 then
+                param.signal = no_signal
+            elseif i == 1 then
+                param.signal = signal_F
+            elseif i == 2 then
+                param.signal = signal_E
             end
         end
-
-        self.zero_signal = (filled_count == 0 and empty_count == 0) or false
-        if has_changed then self.cb.parameters = self.cb_params end
-    else
-        if not self.zero_signal then
-            self:reset_params()
-        end
     end
+
+    self.zero_signal = (filled_count == 0 and empty_count == 0) or false
+    if has_changed then self.cb.parameters = self.cb_params end
 end
 
 -- params management
